@@ -43,11 +43,10 @@ export default function ZondaScrollCanvas({
     const iW = img.naturalWidth;
     const iH = img.naturalHeight;
 
-    let scale = Math.min(W / iW, H / iH);
-    if (window.innerWidth < 768) {
-      scale *= 1.6;
-    }
+    // Use Math.max to achieve 'object-cover' logic, leaving zero empty space on the sides
+    const scale = Math.max(W / iW, H / iH);
     
+    // Calculate centered offsets
     const x = (W - iW * scale) / 2;
     const y = (H - iH * scale) / 2;
 
