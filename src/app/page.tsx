@@ -1,65 +1,81 @@
-import Image from "next/image";
+'use client';
+
+import { useRef } from 'react';
+import { useScroll } from 'framer-motion';
+import Navbar from '@/components/Navbar';
+import ZondaScrollCanvas from '@/components/ZondaScrollCanvas';
+import ZondaExperience from '@/components/ZondaExperience';
+import SpecsGrid from '@/components/SpecsGrid';
+import Features from '@/components/Features';
+import Footer from '@/components/Footer';
+import ScrollAudio from '@/components/ScrollAudio';
+
+const TOTAL_FRAMES = 240;
+const IMAGE_FOLDER = '/images/zonda-sequence';
 
 export default function Home() {
+  // The scroll container that locks the user for 600vh
+  const containerRef = useRef<HTMLElement>(null);
+
+  // Single source of truth for scroll progress — passed to all children
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    // offsetEnd 'end end' means scrollYProgress hits 1.0 when the
+    // bottom of the container aligns with the bottom of the viewport
+    offset: ['start start', 'end end'],
+  });
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+    <main className="bg-pagani-black">
+      {/* ── NAVBAR ─────────────────────────────────────────────── */}
+      <Navbar />
+
+      {/* ── SCROLL-LOCKED IMAGE SEQUENCE (600vh) ───────────────── */}
+      <section
+        ref={containerRef}
+        className="relative"
+        style={{ height: '600vh' }}
+        aria-label="BMW M5 Competition 360-degree showcase"
+      >
+        {/* Sticky viewport that pins the canvas + HUD for the full 600vh */}
+        <div
+          className="sticky top-0 w-full overflow-hidden"
+          style={{ height: '100vh' }}
+        >
+          {/* Layer 0 — Image sequence canvas */}
+          <div className="absolute inset-0" style={{ zIndex: 0 }}>
+            <ZondaScrollCanvas
+              scrollYProgress={scrollYProgress}
+              totalFrames={TOTAL_FRAMES}
+              imageFolderPath={IMAGE_FOLDER}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </div>
+
+          {/* Layer 10 — HUD text overlay */}
+          <div className="absolute inset-0" style={{ zIndex: 10 }}>
+            <ZondaExperience scrollYProgress={scrollYProgress} />
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* ── BELOW-THE-FOLD CONTENT (scrolls freely) ────────────── */}
+      <div className="relative bg-pagani-black" style={{ zIndex: 20 }}>
+        {/* Separator gradient */}
+        <div className="h-px bg-gradient-to-r from-transparent via-pagani-gold/30 to-transparent" />
+
+        <SpecsGrid />
+
+        <div className="h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+
+        <Features />
+
+        <div className="h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+
+        <Footer />
+      </div>
+
+      {/* Global Scroll Audio Player */}
+      <ScrollAudio scrollYProgress={scrollYProgress} />
+    </main>
   );
 }
