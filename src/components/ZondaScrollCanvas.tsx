@@ -43,8 +43,12 @@ export default function ZondaScrollCanvas({
     const iW = img.naturalWidth;
     const iH = img.naturalHeight;
 
-    // Use Math.max to achieve 'object-cover' logic, leaving zero empty space on the sides
-    const scale = Math.max(W / iW, H / iH);
+    const isMobile = window.innerWidth < 768;
+    
+    // On desktop (landscape), object-cover Math.max works beautifully.
+    // On mobile (portrait), we lock it to the width (W/iW) and apply a slight zoom (1.2x)
+    // so the car fills the screen prominently without leaving large transparent margins.
+    let scale = isMobile ? (W / iW) * 1.2 : Math.max(W / iW, H / iH);
     
     // Calculate centered offsets
     const x = (W - iW * scale) / 2;
@@ -80,7 +84,7 @@ export default function ZondaScrollCanvas({
 
     const ctx = canvas.getContext('2d');
     if (ctx) {
-      ctx.scale(dpr, dpr);
+      // Remove double dpr scaling; drawFrame calculates exact physical pixels
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
     }

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 const links = [
@@ -9,7 +10,11 @@ const links = [
 ];
 
 export default function Footer() {
-  const year = new Date().getFullYear();
+  const [year, setYear] = useState(2026);
+
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
 
   return (
     <footer
@@ -75,7 +80,7 @@ export default function Footer() {
             className="font-rajdhani text-white/20 text-xs tracking-[0.3em] uppercase"
             style={{ fontFamily: 'var(--font-rajdhani)' }}
           >
-            © {year} BMW M GmbH. All rights reserved. <span className="mx-2 opacity-50">|</span> Created by <span className="text-pagani-gold">Ankesh _kumar_singh</span>
+            © <span suppressHydrationWarning>{year}</span> BMW M GmbH. All rights reserved. <span className="mx-2 opacity-50">|</span> Created by <span className="text-pagani-gold">Ankesh _kumar_singh</span>
           </p>
           <div className="flex gap-6">
             {['Privacy', 'Cookies', 'Legal'].map((item) => (
